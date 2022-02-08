@@ -11,7 +11,7 @@ const Button = ({handleOnClick, text}) => {
 const StasticLine = ({feedback, stat}) => {
   return (
     <>
-      <p> {feedback} {stat} </p>
+      <td>{feedback} {stat}</td>
     </>
   )
 }
@@ -28,14 +28,16 @@ const Statistics = ({good, neutral, bad, all}) => {
   const average = (good - bad) / all
   const positive = ((good / all) * 100) + '%'
   return (
-    <p>
-      <StasticLine feedback='good' stat={good} />
-      <StasticLine feedback='neutral' stat={neutral} /> 
-      <StasticLine feedback='bad' stat={bad} /> 
-      <StasticLine feedback='all' stat={all} />  
-      <StasticLine feedback='average' stat={average} /> 
-      <StasticLine feedback='positive' stat={positive} /> 
-    </p>
+    <table>
+      <tbody>
+        <tr><StasticLine feedback='good' stat={good} /></tr>
+        <tr><StasticLine feedback='neutral' stat={neutral} /></tr>
+        <tr><StasticLine feedback='bad' stat={bad} /></tr>
+        <tr><StasticLine feedback='all' stat={all} /></tr>
+        <tr><StasticLine feedback='average' stat={average} /></tr> 
+        <tr><StasticLine feedback='positive' stat={positive} /></tr>
+      </tbody>
+    </table>
   )
 }
 
