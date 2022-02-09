@@ -1,5 +1,39 @@
 import React, { useState } from 'react'
 
+const Heading = ( props ) =>  <h1> {props.text} </h1>
+
+const Button = ( {handleclick, text} ) => {
+  return (
+    <button onClick={handleclick}> {text} </button>
+  )
+}
+
+const MaxAnecdote = ( {anecdotes, votes} ) => {
+  let maxCount = 0
+  let maxCountIndex = 0
+  for (const [index, voteCount] of Object.entries(votes)){
+    if(voteCount > maxCount) {
+      maxCount = voteCount
+      maxCountIndex = index
+    }
+  }
+
+  const maxAnecdote = anecdotes[maxCountIndex]
+
+  if(maxCount === 0) {
+    return (
+      <p> No votes yet! </p>
+    )
+  }
+
+  return (
+    <>
+      <p> {maxAnecdote} </p>
+      <p> has {maxCount} votes </p>
+    </>
+  )
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often',
@@ -12,7 +46,7 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
-  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0))
+  const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
 
   const handleRandomSelection = () => {
     const randomNumber = Math.floor(Math.random() * anecdotes.length)
@@ -23,15 +57,20 @@ const App = () => {
     const copy_votes = {...votes}
     copy_votes[selected] += 1
     setVotes(copy_votes)
-    console.log(votes)
   }
 
   return (
     <div>
+      <Heading text='Anecdote of the day'/>
+      
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes </p>
-      <button onClick={handleVote}> vote </button>
-      <button onClick={handleRandomSelection}> next anecdote </button> 
+      
+      <Button handleclick={handleVote} text="vote" />
+      <Button handleclick={handleRandomSelection} text='next anecdote' />
+
+      <Heading text='Anecdote with most votes' />
+      <MaxAnecdote anecdotes = {anecdotes} votes = {votes} />
     </div>
   )
 }
