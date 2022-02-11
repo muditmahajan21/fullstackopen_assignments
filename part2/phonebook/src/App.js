@@ -10,11 +10,13 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
+
+    const personsArray = persons.map(e => e.name)
     const personObject = {
       name: newName,
     }
-
-    setPersons(persons.concat(personObject))
+    console.log(`${personObject.name}`)
+    personsArray.includes(`${personObject.name}`) ? alert(`${newName} is already added to the phonebook`) : setPersons(persons.concat(personObject))
     setNewName('')
   }
 
