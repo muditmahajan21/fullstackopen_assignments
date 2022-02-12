@@ -1,18 +1,8 @@
-import { useState } from 'react'
-
-const Name = ( {name, number} ) => <li> {name} {number} </li>
-
+import React, { useState } from 'react'
+import Persons from './components/Persons'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
 const Heading = ( {heading} ) => <h2> {heading} </h2>
-
-const Persons = ( {filterPersons} ) => {
-  return (
-    <ul>
-        {filterPersons.map((filterPerson) => 
-            <Name key={filterPerson.id} name={filterPerson.name} number={filterPerson.number} />
-        )} 
-    </ul>
-  )
-}
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -35,6 +25,7 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
+      id: personsArray.length + 1,
     }
 
     personsArray.includes(`${personObject.name}`) ? alert(`${newName} is already added to the phonebook`) : setPersons(persons.concat(personObject))
@@ -59,22 +50,12 @@ const App = () => {
     <div>
       <Heading heading='Phonebook' />
 
-      <div>
-        filter shown with <input value = {filter} onChange = {handleFilterChange} /> 
-      </div>
+      <Filter onChange={handleFilterChange} value={filter} />
 
       <Heading heading='Add a new number' />
 
-      <form onSubmit = {addPerson}>
-        <div>
-          name: <input value = {newName} onChange = {handleNameChange} /> <br />
-          number: <input value = {newNumber} onChange = {handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-
+      <PersonForm addPerson = {addPerson} newName = {newName} handleNameChange = {handleNameChange} newNumber = {newNumber} handleNumberChange = {handleNumberChange} />
+    
       <Heading heading='Numbers' />
 
       {filter === '' ? <Persons filterPersons = {persons} /> : <Persons filterPersons = {filterPersons} /> }
