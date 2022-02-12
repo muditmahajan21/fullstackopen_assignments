@@ -1,6 +1,18 @@
 import { useState } from 'react'
 
-const Name = ( {name, number} ) => <p> {name} {number}</p>
+const Name = ( {name, number} ) => <li> {name} {number} </li>
+
+const Heading = ( {heading} ) => <h2> {heading} </h2>
+
+const Persons = ( {filterPersons} ) => {
+  return (
+    <ul>
+        {filterPersons.map((filterPerson) => 
+            <Name key={filterPerson.id} name={filterPerson.name} number={filterPerson.number} />
+        )} 
+    </ul>
+  )
+}
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -12,6 +24,8 @@ const App = () => {
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [filter, setFilter] = useState('')
+  const [filterPersons, setFilterPersons] = useState(persons)
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -35,24 +49,35 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value)
+    setFilterPersons(persons.filter((person) => (person.name.toLowerCase().indexOf(event.target.value.toLowerCase()) !== -1)))
+    console.log(filterPersons)
+  }
+
   return (
     <div>
-      <h2>Phonebook</h2>
+      <Heading heading='Phonebook' />
+
+      <div>
+        filter shown with <input value = {filter} onChange = {handleFilterChange} /> 
+      </div>
+
+      <Heading heading='Add a new number' />
+
       <form onSubmit = {addPerson}>
         <div>
-          name: <input value = {newName} onChange = {handleNameChange} />
+          name: <input value = {newName} onChange = {handleNameChange} /> <br />
           number: <input value = {newNumber} onChange = {handleNumberChange} />
         </div>
         <div>
           <button type="submit">add</button>
         </div>
       </form>
-      <h2>Numbers</h2>
-      <ul>
-        {persons.map((person) => 
-            <Name key={person.id} name={person.name} number={person.number} />
-        )} 
-      </ul>
+
+      <Heading heading='Numbers' />
+
+      {filter === '' ? <Persons filterPersons = {persons} /> : <Persons filterPersons = {filterPersons} /> }
     </div>
   )
 }
