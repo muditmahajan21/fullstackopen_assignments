@@ -73,7 +73,7 @@ const App = () => {
     
       <Heading heading='Numbers' />
 
-      {filter === '' ? <Persons filterPersons = {persons} /> : <Persons filterPersons = {filterPersons} /> }
+      {filter === '' ? <Persons filterPersons = {persons} setPersons={setPersons} /> : <Persons filterPersons = {filterPersons} setPersons={setPersons} /> }
     </div>
   )
 }
