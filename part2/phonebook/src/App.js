@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
+import ErrorNotification from './components/ErrorNotification'
 
 import personService from './services/persons'
 
@@ -16,6 +18,9 @@ const App = () => {
 
   const [filter, setFilter] = useState('')
   const [filterPersons, setFilterPersons] = useState(persons)
+
+  const [changeMessage, setChangeMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -54,7 +59,19 @@ const App = () => {
             person.id !== returnedPerson.id ? person : returnedPerson
             )
             setPersons(updatedPersons)
+            setChangeMessage(`Edited ${personObject.name}`)
+            setTimeout(() => {
+              setChangeMessage(null)
+            }, 5000)
         })
+        
+        .catch((err) => {
+          setErrorMessage(`${personObject.name} was already removed from server`)
+          setTimeout(() => {
+              setErrorMessage(null)
+          }, 5000)
+          setPersons(persons.filter(e => e.id != alreadyPresentId))
+      })
       }
     }
     else {
@@ -62,9 +79,15 @@ const App = () => {
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
-        setNewName('')
       })
+
+      setChangeMessage(`Added ${personObject.name}`)
+      setTimeout(() => {
+        setChangeMessage(null)
+      }, 5000)
     }
+    setNewName('')
+    setNewNumber('')
   }
 
   const handleNameChange = (event) => {
@@ -84,7 +107,8 @@ const App = () => {
   return (
     <div>
       <Heading heading='Phonebook' />
-
+      <Notification message={changeMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter onChange={handleFilterChange} value={filter} />
 
       <Heading heading='Add a new number' />
