@@ -35,16 +35,36 @@ const App = () => {
       number: newNumber,
       id: personsArray.length + 1,
     }
+    
+    const alreadyPresent = personsArray.includes(`${personObject.name}`)
 
-    personsArray.includes(`${personObject.name}`) ? 
-      alert(`${newName} is already added to the phonebook`) 
-      : 
+    if(alreadyPresent) {
+      const alreadyPresentPerson = persons.filter(person => person.name === newName)
+      const alreadyPresentId = alreadyPresentPerson.map(person => person.id)[0]
+
+      const confirmUpdate = window.confirm(
+        `${newName} is already added to the phonebook, replace the old number with a new one?`
+      )
+
+      if(confirmUpdate) {
+        personService
+        .update(alreadyPresentId, personObject)
+        .then(returnedPerson => {
+          const updatedPersons = persons.map(person => 
+            person.id !== returnedPerson.id ? person : returnedPerson
+            )
+            setPersons(updatedPersons)
+        })
+      }
+    }
+    else {
       personService
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
       })
+    }
   }
 
   const handleNameChange = (event) => {
