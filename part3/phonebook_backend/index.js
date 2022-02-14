@@ -27,7 +27,18 @@ let persons = [
     }
 ]
 
-app.use(morgan('tiny'))
+morgan.token('post', (request, response) => {
+    if(request.method === 'POST') {
+        return JSON.stringify(request.body)
+    }
+    else {
+        return ''
+    }
+})
+
+morgan.format('postway', ':method :url :status :res[content-length] - :response-time ms :post')
+
+app.use(morgan('postway'))
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
