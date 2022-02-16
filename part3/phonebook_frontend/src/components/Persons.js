@@ -1,8 +1,9 @@
 import React from 'react'
 
-import personService from '../services/persons'
- 
-const Persons = ( {filterPersons, setPersons} ) => {
+import personService from '../services/persons' 
+
+
+const Persons = ( {filterPersons, setPersons, setErrorMessage} ) => {
 
     const confirmDelete = ( filterPerson ) => {
 
@@ -10,7 +11,14 @@ const Persons = ( {filterPersons, setPersons} ) => {
         if(confirmation) {
             personService
             .deleteObject(filterPerson.id)
-            setPersons(filterPersons.filter(item => item !== filterPerson))
+            
+            .then(response => {
+                setPersons(filterPersons.filter(item => item !== filterPerson))
+                setErrorMessage(`${filterPerson.name} was deleted`)
+                setTimeout(() => {
+                    setErrorMessage(null)
+                }, 5000)
+            })
         }
     }
 
@@ -25,6 +33,7 @@ const Persons = ( {filterPersons, setPersons} ) => {
             </ul>
           )} 
       </ul>
+      
     )
 }
   

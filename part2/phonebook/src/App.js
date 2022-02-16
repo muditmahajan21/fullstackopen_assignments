@@ -63,14 +63,14 @@ const App = () => {
             setTimeout(() => {
               setChangeMessage(null)
             }, 5000)
-        })
-        
-        .catch((err) => {
-          setErrorMessage(`${personObject.name} was already removed from server`)
+        })        
+        .catch(err => {
+          console.error(err)
+          setErrorMessage(err.response.data.error)
           setTimeout(() => {
               setErrorMessage(null)
           }, 5000)
-          setPersons(persons.filter(e => e.id != alreadyPresentId))
+          setPersons(persons.filter(e => e.id !== alreadyPresentId))
       })
       }
     }
@@ -79,12 +79,17 @@ const App = () => {
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setChangeMessage(`Added ${personObject.name}`)
+        setTimeout(() => {
+          setChangeMessage(null)
+        }, 5000)
       })
-
-      setChangeMessage(`Added ${personObject.name}`)
-      setTimeout(() => {
-        setChangeMessage(null)
-      }, 5000)
+      .catch((err) => {
+        setErrorMessage(err.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
     }
     setNewName('')
     setNewNumber('')
@@ -117,7 +122,7 @@ const App = () => {
     
       <Heading heading='Numbers' />
 
-      {filter === '' ? <Persons filterPersons = {persons} setPersons={setPersons} /> : <Persons filterPersons = {filterPersons} setPersons={setPersons} /> }
+      {filter === '' ? <Persons filterPersons = {persons} setPersons={setPersons} setErrorMessage = {setErrorMessage} /> : <Persons filterPersons = {filterPersons} setPersons={setPersons} setErrorMessage={setErrorMessage} /> }
     </div>
   )
 }

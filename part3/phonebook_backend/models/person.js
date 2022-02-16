@@ -1,9 +1,13 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
+
+// eslint-disable-next-line no-undef
 const url = process.env.MONGODB_URI
 
 console.log(`Connecting to ${url}`)
 
 mongoose.connect(url)
+    // eslint-disable-next-line no-unused-vars
     .then(result => {
         console.log(`Connected to ${url}`)
     })
@@ -12,8 +16,8 @@ mongoose.connect(url)
     })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: { type: String, required: true, unique: true, minlength: [3, 'Length of the name is smaller than minimum length(3)'] },
+    number: { type: String, required: true, unique: true, minlength: [8, 'Length of the number is smaller than minimum length(8)'] },
 })
 
 personSchema.set('toJSON', {
@@ -23,5 +27,7 @@ personSchema.set('toJSON', {
       delete returnedObject.__v
     }
   })
+
+personSchema.plugin(uniqueValidator)
 
 module.exports = mongoose.model('Person', personSchema)

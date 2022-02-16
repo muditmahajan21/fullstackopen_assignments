@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 require('dotenv').config()
 const express = require('express')
 const app = express()
@@ -12,7 +13,7 @@ app.use(cors())
 app.use(express.static('build'))
 
 
-morgan.token('post', (request, response) => {
+morgan.token('post', (request) => {
     if(request.method === 'POST') {
         return JSON.stringify(request.body)
     }
@@ -62,7 +63,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(err => next(err))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     if(body.name === undefined || body.number === undefined) {
@@ -77,17 +78,18 @@ app.post('/api/persons', (request, response) => {
     person.save().then(addedPersons => {
         return response.json(addedPersons)
     })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
-
+    
     const person = {
         name: body.name,
         number: body.number
     }
     
-    Person.findByIdAndUpdate(request.params.id, person, {new:true})
+    Person.findByIdAndUpdate(request.params.id, person, {new:true, runVlidators: true, context: 'query'})
     .then(updatedPerson => {
         response.json(updatedPerson)
     })
@@ -105,6 +107,8 @@ const errorHandler = (error, request, response, next) => {
 
     if(error.name === 'CastError') {
         return response.status(400).send({error: 'Malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({error: error.message})
     }
 
     next(error)
@@ -112,6 +116,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
+// eslint-disable-next-line no-undef
 const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on PORT ${PORT}`)
