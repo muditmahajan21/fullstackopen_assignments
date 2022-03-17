@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import login from './services/login'
 import loginService from './services/login'
 
+const BlogForm = ({onSubmit, newTitle, handleTitleChange, newAuthor, handleAuthorChange, newUrl, handleUrlChange}) =>
+  
+  <form onSubmit={onSubmit}>
+        <div>
+            Title: <input value={newTitle} onChange={handleTitleChange} />
+        </div>
+        <div>
+            Author: <input value={newAuthor} onChange={handleAuthorChange} />
+        </div>
+        <div>
+            Url: <input value={newUrl} onChange={handleUrlChange} />
+        </div>
+        <div>
+            <button type="submit">create</button>
+        </div>
+    </form>
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +26,9 @@ const App = () => {
   const [password, setPassword] = useState('') 
   const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
+  const [newBlogTitle, setNewBlogTitle] = useState('')
+  const [newBlogUrl, setNewBlogUrl] = useState('')
+  const [newBlogAuthor, setNewBlogAuthor] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -37,7 +55,8 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
-
+      
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -58,6 +77,39 @@ const App = () => {
     } catch (exception) {
       console.log('logout failed')
     }
+  }
+
+  const addBlog = async (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: newBlogTitle,
+      url: newBlogUrl,
+      author: newBlogAuthor,
+    }
+
+    try {
+      await blogService.create(blogObject)
+      setNewBlogTitle('')
+      setNewBlogUrl('')
+      setNewBlogAuthor('')
+      
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    } catch (exception) {
+      console.log('Cannot add new blog')
+    }
+  }
+
+  const handleTitleChange = (event) => {
+    setNewBlogTitle(event.target.value)
+  }
+
+  const handleAuthorChange = (event) => {
+    setNewBlogAuthor(event.target.value)
+  }
+
+  const handleUrlChange = (event) => {
+    setNewBlogUrl(event.target.value)
   }
 
   const loginForm = () => (
@@ -86,8 +138,6 @@ const App = () => {
 
   const allBlogs = () => (
     <div>
-    <p> {user.name} logged in </p> 
-    <button onClick={() => setUser(null)}>logout</button>
     {blogs.map(blog =>
       <Blog key={blog.id} blog={blog} />
     )}
@@ -101,7 +151,13 @@ const App = () => {
       
       {user === null ?
         loginForm() :
-        allBlogs()  
+        <div>
+          <p> {user.name} logged in </p> 
+          <button onClick={handleLogout}>logout</button>
+          <h2> Create a new Blog </h2>
+          <BlogForm onSubmit={addBlog} newTitle = {newBlogTitle} handleTitleChange = {handleTitleChange} newAuthor = {newBlogAuthor} handleAuthorChange = {handleAuthorChange} newUrl = {newBlogUrl}  handleUrlChange = {handleUrlChange} />
+          {allBlogs()}  
+        </div>
       }
     </div>
   )
