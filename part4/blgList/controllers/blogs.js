@@ -65,8 +65,25 @@ blogsRouter.put('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    const token = request.token
+    // eslint-disable-next-line no-undef
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+
+    const user = await User.findById(decodedToken.id)
+
+    const blogToDelete = await Blog.findById(request.params.id)
+
+    if(blogToDelete.user._id.toString() === user._id.toString()) {
+        try {
+            await Blog.findByIdAndRemove(request.params.id)
+            response.status(204).end()
+        } catch (exception) {
+            return response.status(401).json({ error: 'unauthorized token' })
+        }
+    }
+    else {
+        return response.status(401).json({ error: 'unauthorized token' })
+    }
 })
 
 module.exports = blogsRouter
