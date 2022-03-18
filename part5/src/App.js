@@ -12,9 +12,8 @@ const App = () => {
   const [password, setPassword] = useState('') 
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [user, setUser] = useState(null)
-  const [newBlogTitle, setNewBlogTitle] = useState('')
-  const [newBlogUrl, setNewBlogUrl] = useState('')
-  const [newBlogAuthor, setNewBlogAuthor] = useState('')
+  const [loginVisible, setLoginVisible] = useState(false)
+  const [blogFormVisible, setBlogFormVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -77,23 +76,13 @@ const App = () => {
     }
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: newBlogTitle,
-      url: newBlogUrl,
-      author: newBlogAuthor,
-    }
-
+  const addBlog = async (newBlog) => {
     try {
-      await blogService.create(blogObject)
-      setNewBlogTitle('')
-      setNewBlogUrl('')
-      setNewBlogAuthor('')
-      
+      const createdBlog = await blogService.create(newBlog)
+      setBlogFormVisible(false)
       const blogs = await blogService.getAll()
       setBlogs(blogs)
-      setNotificationMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+      setNotificationMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
       setTimeout(() => {
         setNotificationMessage(null)
       } , 5000)
@@ -104,18 +93,6 @@ const App = () => {
       }, 5000)
       console.log('Cannot add new blog')
     }
-  }
-
-  const handleTitleChange = (event) => {
-    setNewBlogTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setNewBlogAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setNewBlogUrl(event.target.value)
   }
 
   const handleUsernameChange = (event) => {
@@ -134,31 +111,58 @@ const App = () => {
     </div>
   )
 
-  return (
-    <div>
-      <h2>blogs</h2>
-      <Notification notificationMessage = {notificationMessage} />
-      {user === null ?
+  const loginform = () => {
+    const hideWhenVisible = {display: loginVisible ? 'none' : ''}
+    const showWhenVisible = {display: loginVisible ? '' : 'none'}
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>Log in</button>
+        </div>
+        <div style={showWhenVisible}>
         <LoginForm 
           handleLogin={handleLogin} 
           username={username} 
           handleUsernameChange={handleUsernameChange} 
           password={password} 
           handlePasswordChange={handlePasswordChange} 
-        />:
+        />
+        <button onClick={() => setLoginVisible(false)}> Cancel </button>
+        </div>
+      </div>
+    )
+  }
+
+  const blogForm = () => {
+    const hideWhenVisible = {display: blogFormVisible ? 'none' : ''}
+    const showWhenVisible = {display: blogFormVisible ? '' : 'none'}
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setBlogFormVisible(true)}>Add new blog</button>
+        </div>
+        <div style={showWhenVisible}>
+        <h2> Create a new Blog </h2>
+        <BlogForm createBlog={addBlog}/>
+          <button onClick={() => setBlogFormVisible(false)}> Cancel </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification notificationMessage = {notificationMessage} />
+      {user === null ?
+        <div>
+          {loginform()}
+        </div>
+        :
         <div>
           <p> {user.name} logged in </p> 
           <button onClick={handleLogout}>logout</button>
-          <h2> Create a new Blog </h2>
-          <BlogForm 
-            onSubmit={addBlog} 
-            newTitle = {newBlogTitle} 
-            handleTitleChange = {handleTitleChange} 
-            newAuthor = {newBlogAuthor} 
-            handleAuthorChange = {handleAuthorChange} 
-            newUrl = {newBlogUrl}  
-            handleUrlChange = {handleUrlChange} 
-          />
+          {blogForm()}
           {allBlogs()}  
         </div>
       }
