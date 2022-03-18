@@ -14,7 +14,7 @@ const getAll = () => {
 
 const create = async newObject => {
   const config = {
-    headers: { Authorization: token }, 
+    headers: { Authorization: token },
   }
 
   const response = await axios.post(baseUrl, newObject, config)
@@ -39,5 +39,4 @@ const remove = async deleteObject => {
   return response.data
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default { getAll, create, setToken, update, remove }

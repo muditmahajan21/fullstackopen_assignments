@@ -8,13 +8,14 @@ import LoginForm from './components/LoginForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')   
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [loginVisible, setLoginVisible] = useState(false)
   const [blogFormVisible, setBlogFormVisible] = useState(false)
 
+  // eslint-disable-next-line no-unused-vars
   const getAllBlogs = async (event) => {
     const blogs = await blogService.getAll()
     setBlogs(blogs)
@@ -31,7 +32,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password
@@ -40,7 +41,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
-      
+
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -50,9 +51,9 @@ const App = () => {
         setNotificationMessage(null)
       }, 5000)
     } catch (exception) {
-      setNotificationMessage('Wrong credentials')      
+      setNotificationMessage('Wrong credentials')
       setTimeout(() => {
-        setNotificationMessage(null)      
+        setNotificationMessage(null)
       }, 5000)
       console.log('Wrong credentials')
     }
@@ -144,50 +145,50 @@ const App = () => {
 
   const allBlogs = () => (
     <div>
-    {blogs.sort(byLikes).map(blog =>
-      <Blog 
-        key={blog.id} 
-        blog={blog}
-        updateBlog={updateBlog}
-        deleteBlog={deleteBlog}
-       />
-    )}
+      {blogs.sort(byLikes).map(blog =>
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          deleteBlog={deleteBlog}
+        />
+      )}
     </div>
   )
 
   const loginform = () => {
-    const hideWhenVisible = {display: loginVisible ? 'none' : ''}
-    const showWhenVisible = {display: loginVisible ? '' : 'none'}
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
     return (
       <div>
         <div style={hideWhenVisible}>
           <button onClick={() => setLoginVisible(true)}>Log in</button>
         </div>
         <div style={showWhenVisible}>
-        <LoginForm 
-          handleLogin={handleLogin} 
-          username={username} 
-          handleUsernameChange={handleUsernameChange} 
-          password={password} 
-          handlePasswordChange={handlePasswordChange} 
-        />
-        <button onClick={() => setLoginVisible(false)}> Cancel </button>
+          <LoginForm
+            handleLogin={handleLogin}
+            username={username}
+            handleUsernameChange={handleUsernameChange}
+            password={password}
+            handlePasswordChange={handlePasswordChange}
+          />
+          <button onClick={() => setLoginVisible(false)}> Cancel </button>
         </div>
       </div>
     )
   }
 
   const blogForm = () => {
-    const hideWhenVisible = {display: blogFormVisible ? 'none' : ''}
-    const showWhenVisible = {display: blogFormVisible ? '' : 'none'}
+    const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
+    const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
     return (
       <div>
         <div style={hideWhenVisible}>
           <button onClick={() => setBlogFormVisible(true)}>Add new blog</button>
         </div>
         <div style={showWhenVisible}>
-        <h2> Create a new Blog </h2>
-        <BlogForm createBlog={addBlog}/>
+          <h2> Create a new Blog </h2>
+          <BlogForm createBlog={addBlog}/>
           <button onClick={() => setBlogFormVisible(false)}> Cancel </button>
         </div>
       </div>
@@ -204,10 +205,10 @@ const App = () => {
         </div>
         :
         <div>
-          <p> {user.name} logged in </p> 
+          <p> {user.name} logged in </p>
           <button onClick={handleLogout}>logout</button>
           {blogForm()}
-          {allBlogs()}  
+          {allBlogs()}
         </div>
       }
     </div>
