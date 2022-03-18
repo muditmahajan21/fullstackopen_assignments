@@ -15,17 +15,17 @@ const App = () => {
   const [loginVisible, setLoginVisible] = useState(false)
   const [blogFormVisible, setBlogFormVisible] = useState(false)
 
-  useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
-  }, [])
+  const getAllBlogs = async (event) => {
+    const blogs = await blogService.getAll()
+    setBlogs(blogs)
+  }
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if(loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      getAllBlogs()
     }
   }, [])
 
@@ -95,6 +95,43 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (toUpdateBlog) => {
+    try {
+      const updatedBlog = blogService.update(toUpdateBlog)
+      setNotificationMessage(`blog ${toUpdateBlog.title} by ${toUpdateBlog.author} updated`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      } , 5000)
+      const updatedBlogs = blogs.map(b => b.id !== updatedBlog.id ? b : updatedBlog)
+      setBlogs(updatedBlogs)
+    } catch (exception) {
+      console.log(exception)
+      setNotificationMessage('Blog update failed')
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+    }
+  }
+
+  const deleteBlog = async (toDeleteBlog) => {
+    try {
+      if(window.confirm(`Delete ${toDeleteBlog.title}?`)) {
+        blogService.remove(toDeleteBlog)
+        setNotificationMessage(`blog ${toDeleteBlog.title} by ${toDeleteBlog.author} deleted`)
+        const updatedBlogs = blogs.filter(b => b.id !== toDeleteBlog.id)
+        setBlogs(updatedBlogs)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        } , 5000)
+      }
+    } catch (exception) {
+      setNotificationMessage('Blog deletion failed')
+      setTimeout(() => {
+        setNotificationMessage(null)
+      } , 5000)
+    }
+  }
+
   const handleUsernameChange = (event) => {
     setUsername(event.target.value)
   }
@@ -103,10 +140,17 @@ const App = () => {
     setPassword(event.target.value)
   }
 
+  const byLikes = (blog1, blog2) => blog2.likes - blog1.likes
+
   const allBlogs = () => (
     <div>
-    {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
+    {blogs.sort(byLikes).map(blog =>
+      <Blog 
+        key={blog.id} 
+        blog={blog}
+        updateBlog={updateBlog}
+        deleteBlog={deleteBlog}
+       />
     )}
     </div>
   )
