@@ -147,6 +147,7 @@ const App = () => {
     <div>
       {blogs.sort(byLikes).map(blog =>
         <Blog
+          id = "blog"
           key={blog.id}
           blog={blog}
           updateBlog={updateBlog}
