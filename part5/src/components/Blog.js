@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
@@ -37,17 +36,12 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
       <p> {blog.title} - {blog.author} <button onClick={toggleVisibility}> {buttonLabel} </button> </p>
       <div style={showWhenVisible}>
         <p> {blog.url} </p>
-        <p> Likes : {blogObject.likes} <button onClick={increaseLikes}> like </button> </p>
+        <p> Likes : {blogObject.likes} <button id = "likes" onClick={increaseLikes}> like </button> </p>
         <button onClick={removeBlog} > Delete </button>
       </div>
     </div>
   )
 }
 
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  deleteBlog: PropTypes.func.isRequired
-}
 
 export default Blog
